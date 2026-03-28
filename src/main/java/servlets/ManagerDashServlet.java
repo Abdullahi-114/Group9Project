@@ -35,19 +35,35 @@ public class ManagerDashServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// Check user is an authorized Manager
-		// TODO
 		// If they are, forward the user to their Manager Dashboard
 		HttpSession s = request.getSession(false);
+
+		if (s == null) {
+			bounce(request, response, "Please log in first.");
+			return;
+		}
+
 		Integer userId = (Integer) s.getAttribute("userId");
 		User u;
+
 		if (userId == null) {
-			bounce(request, response, "loginError");
+			bounce(request, response, "Session expired. Please log in again.");
+			return;
 		}
+
 		u = userServ.getUser(userId);
-		if (!u.isManager()) {
-			bounce(request, response, "InsufficientRights");
+
+		if (u == null) {
+			bounce(request, response, "User not found.");
+			return;
 		}
-		
+
+		if (!u.isManager()) {
+			bounce(request, response, "Access denied. Manager account required.");
+			return;
+		}
+
+		request.setAttribute("manager", u);
 		request.getRequestDispatcher(MAN_DASH_JSP)
 		.forward(request, response);
 	}
@@ -56,19 +72,16 @@ public class ManagerDashServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		
-		request.getRequestDispatcher(MAN_DASH_JSP)
-		.forward(request, response);
+		doGet(request, response);
 	}
 	
 	private void bounce(HttpServletRequest request,
 			 HttpServletResponse response,
-			 String status)
+			 String message)
 			 throws ServletException, IOException {
 
-		request.setAttribute("status", status);
-		request.getRequestDispatcher("/login")
+		request.setAttribute("loginError", message);
+		request.getRequestDispatcher("/WEB-INF/views/login.jsp")
 		.forward(request, response);
 	}
 
