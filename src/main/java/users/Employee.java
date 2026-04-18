@@ -1,6 +1,7 @@
 package users;
 
 import shiftEligibility.ShiftEligibilityStrat;
+import shifts.Shift;
 
 /**
  * Employee forms the base class for the different
@@ -48,6 +49,10 @@ public class Employee extends User {
 	
 	public Boolean isManager() {
 		return false;
+	}
+	
+	public Boolean canSelectShift(Shift shift) {
+		return eligibility.canSelectShift(this, shift);
 	}
 	
 	// Builder

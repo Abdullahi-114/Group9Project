@@ -1,5 +1,6 @@
 package services;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,6 +60,12 @@ public interface ShiftService {
 	List<Shift> getShiftByManagerId(int managerId);
 	
 	/**
+	 * @param managerId
+	 * @return			All open shifts with this managerId
+	 */
+	List<Shift> getOpenShifts(int managerId);
+	
+	/**
 	 * @param date	the desired date.
 	 * @return		a list of all shifts on the chosen day.
 	 */
@@ -91,5 +98,17 @@ public interface ShiftService {
 	 * @param shift object containing new shift information
 	 */
 	void updateShift(Shift shift);
+	
+	/**
+	 * @param userId
+	 * @return			Amount of time the user has been schedule to work that week
+	 */
+	Duration getScheduledTimeByWeek(LocalDate weekOf, int userId);
+	
+	/**
+	 * @param userId
+	 * @return			Amount of time the user has been schedule to work that day
+	 */
+	Duration getScheduledTimeByDay(LocalDate date, int userId);
 	
 }
