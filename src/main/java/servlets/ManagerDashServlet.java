@@ -20,56 +20,46 @@ import dao.UserDAO;
 public class ManagerDashServlet extends HttpServlet {
 	private static final String MAN_DASH_JSP = "/WEB-INF/views/ManagerDashboard.jsp";
 	private static final long serialVersionUID = 1L;
-	
+
 	private static final UserService userServ = new UserDAO();
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ManagerDashServlet() {
-        super();
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+	public ManagerDashServlet() {
+		super();
+	}
+
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// Check user is an authorized Manager
-		// TODO
-		// If they are, forward the user to their Manager Dashboard
+		// Check that the user has a valid session
 		HttpSession s = request.getSession(false);
-		Integer userId = (Integer) s.getAttribute("userId");
-		User u;
-		if (userId == null) {
+
+		if (s == null || s.getAttribute("userId") == null) {
 			bounce(request, response, "loginError");
+			return;
 		}
-		u = userServ.getUser(userId);
-		if (!u.isManager()) {
+
+		Integer userId = (Integer) s.getAttribute("userId");
+		User u = userServ.getUser(userId);
+
+		// Check that the user exists and is a manager
+		if (u == null || !u.isManager()) {
 			bounce(request, response, "InsufficientRights");
+			return;
 		}
-		
-		request.getRequestDispatcher(MAN_DASH_JSP)
-		.forward(request, response);
+
+		// Pass manager object to JSP
+		request.setAttribute("manager", u);
+		request.getRequestDispatcher(MAN_DASH_JSP).forward(request, response);
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		
-		request.getRequestDispatcher(MAN_DASH_JSP)
-		.forward(request, response);
+		doGet(request, response);
 	}
-	
+
 	private void bounce(HttpServletRequest request,
-			 HttpServletResponse response,
-			 String status)
-			 throws ServletException, IOException {
+						HttpServletResponse response,
+						String status)
+			throws ServletException, IOException {
 
 		request.setAttribute("status", status);
-		request.getRequestDispatcher("/login")
-		.forward(request, response);
+		request.getRequestDispatcher("/login").forward(request, response);
 	}
-
 }
