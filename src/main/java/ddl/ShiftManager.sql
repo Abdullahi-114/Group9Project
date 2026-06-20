@@ -4,7 +4,7 @@ CREATE DATABASE ShiftManager;
 USE ShiftManager;
 
 -- Users
-CREATE TABLE IF NOT EXISTS u (
+CREATE TABLE IF NOT EXISTS users (
 	userId		int			NOT NULL UNIQUE AUTO_INCREMENT,
 	firstName	varchar(50)	NOT NULL,
     lastName	varchar(50)	NOT NULL,
